@@ -8,12 +8,14 @@ import java.util.stream.Collectors;
 public final class Field {
     private final int fieldDimension = 10;
     private final static HashMap<Character, Integer> letterToInt = new HashMap<Character, Integer>(
-            Map.of('A', 1, 'B', 2, 'C', 3, 'D', 4, 'E', 6, 'F', 7, 'H', 8)
+            Map.of('A', 1, 'B', 2, 'C', 3, 'D', 4, 'E', 5, 'F', 6, 'G', 7, 'H', 8)
     );
     public Cell[][] field = new Cell[fieldDimension][fieldDimension];
 
     Cell parsePosition(String position) {
-        return returnAtPos(position.charAt(0), Character.getNumericValue(position.charAt(1)));
+        System.out.println();
+        System.out.println(letterToInt.get(position.charAt(1)));
+        return returnAtPos(position.charAt(0) - 48, letterToInt.get(position.charAt(1)));
     }
     public GameMode gameMode;
 
@@ -31,8 +33,8 @@ public final class Field {
         }
     }
 
-    public Cell returnAtPos(int i, int j) {
-        return field[i][j];
+    public Cell returnAtPos(int x, int y) {
+        return field[x][y];
     }
 
     private void setCellByPostion(int i, int j) {
@@ -66,26 +68,48 @@ public final class Field {
         }
     }
 
+    public boolean isOneMove(Cell cell, CellState base, CellState findForClose) {
+        return checkForMoves(cell, base, findForClose).entrySet().stream().anyMatch(x -> x.getValue());
+    }
     public Map<Direction, Boolean> checkForMoves(Cell cell, CellState base, CellState findForClose) {
         return Map.of(
-               Direction.Up, checkUp(returnAtPos(cell.xPos, cell.yPos - 1), base, findForClose, false),
-               Direction.Down, checkDown(returnAtPos(cell.xPos, cell.yPos + 1), base, findForClose, false),
-               Direction.Left, checkLeft(returnAtPos(cell.xPos - 1, cell.yPos), base, findForClose, false),
-               Direction.Right, checkRight(returnAtPos(cell.xPos + 1, cell.yPos), base, findForClose, false),
-               Direction.LeftUp, checkLeftUp(returnAtPos(cell.xPos - 1, cell.yPos - 1), base, findForClose, false),
-               Direction.RightUp, checkRightUp(returnAtPos(cell.xPos + 1, cell.yPos - 1), base, findForClose, false),
-               Direction.LeftDown, checkLeftDown(returnAtPos(cell.xPos - 1, cell.yPos + 1), base, findForClose, false),
-               Direction.RightDown, checkRightDown(returnAtPos(cell.xPos + 1, cell.yPos + 1), base, findForClose, false)
+               Direction.Up, checkUp(returnAtPos(cell.xPos, cell.yPos - 1), base, findForClose, false, false),
+               Direction.Down, checkDown(returnAtPos(cell.xPos, cell.yPos + 1), base, findForClose, false, false),
+               Direction.Left, checkLeft(returnAtPos(cell.xPos - 1, cell.yPos), base, findForClose, false, false),
+               Direction.Right, checkRight(returnAtPos(cell.xPos + 1, cell.yPos), base, findForClose, false, false),
+               Direction.LeftUp, checkLeftUp(returnAtPos(cell.xPos - 1, cell.yPos - 1), base, findForClose, false, false),
+               Direction.RightUp, checkRightUp(returnAtPos(cell.xPos + 1, cell.yPos - 1), base, findForClose, false, false),
+               Direction.LeftDown, checkLeftDown(returnAtPos(cell.xPos - 1, cell.yPos + 1), base, findForClose, false, false),
+               Direction.RightDown, checkRightDown(returnAtPos(cell.xPos + 1, cell.yPos + 1), base, findForClose, false, false)
         );
-
     }
 
-    public boolean checkLeft(Cell cell, CellState base, CellState findForClose, boolean canReturn) {
+    public void restoreCell(Cell cell, Direction direction, CellState base, CellState findForClose) {
+        switch (direction) {
+            case Up -> checkUp(returnAtPos(cell.xPos, cell.yPos - 1), base, findForClose, false, true);
+            case Down -> checkDown(returnAtPos(cell.xPos, cell.yPos + 1), base, findForClose, false, true);
+            case Left -> checkLeft(returnAtPos(cell.xPos - 1, cell.yPos), base, findForClose, false, true);
+            case Right -> checkRight(returnAtPos(cell.xPos + 1, cell.yPos), base, findForClose, false, true);
+            case LeftUp -> checkLeftUp(returnAtPos(cell.xPos - 1, cell.yPos - 1), base, findForClose, false, true);
+            case RightUp -> checkRightUp(returnAtPos(cell.xPos + 1, cell.yPos - 1), base, findForClose, false, false);
+            case LeftDown -> checkLeftDown(returnAtPos(cell.xPos - 1, cell.yPos + 1), base, findForClose, false, false);
+            case RightDown -> checkRightDown(returnAtPos(cell.xPos + 1, cell.yPos + 1), base, findForClose, false, false);
+            default -> throw new IllegalStateException("Unexpected value: " + direction);
+        }
+    }
+
+    ///
+    public boolean checkLeft(Cell cell, CellState base, CellState findForClose, boolean canReturn, boolean shouldChange) {
         if (cell.state != base && cell.state != findForClose) {
             return false;
         }
         if (cell.state == findForClose) {
-            return checkLeft(returnAtPos(cell.xPos - 1, cell.yPos), base, findForClose, true);
+            boolean check = checkLeft(returnAtPos(cell.xPos - 1, cell.yPos), base, findForClose, true, false);
+            if (shouldChange) {
+                if (check) {
+                    cell.state = base;
+                }
+            }
         }
         else if (cell.state == base && canReturn) {
             return true;
@@ -93,12 +117,18 @@ public final class Field {
         return false;
     }
 
-    public boolean checkRight(Cell cell, CellState base, CellState findForClose, boolean canReturn) {
+    public boolean checkRight(Cell cell, CellState base, CellState findForClose, boolean canReturn, boolean shouldChange) {
         if (cell.state != base && cell.state != findForClose) {
             return false;
         }
         if (cell.state == findForClose) {
-            return checkRight(returnAtPos(cell.xPos + 1, cell.yPos), base, findForClose, true);
+            boolean check = checkRight(returnAtPos(cell.xPos + 1, cell.yPos), base, findForClose, true, false);
+            if (shouldChange) {
+                if (check) {
+                    cell.state = base;
+                }
+            }
+            return check;
         }
         else if (cell.state == base && canReturn) {
             return true;
@@ -106,12 +136,18 @@ public final class Field {
         return false;
     }
 
-    public boolean checkUp(Cell cell, CellState base, CellState findForClose, boolean canReturn) {
+    public boolean checkUp(Cell cell, CellState base, CellState findForClose, boolean canReturn, boolean shouldChange) {
         if (cell.state != base && cell.state != findForClose) {
             return false;
         }
         if (cell.state == findForClose) {
-            return checkUp(returnAtPos(cell.xPos, cell.yPos - 1), base, findForClose, true);
+            boolean check = checkUp(returnAtPos(cell.xPos, cell.yPos - 1), base, findForClose, true, false);
+            if (shouldChange) {
+                if (check) {
+                    cell.state = base;
+                }
+            }
+            return check;
         }
         else if (cell.state == base && canReturn) {
             return true;
@@ -119,12 +155,18 @@ public final class Field {
         return false;
     }
 
-    public boolean checkDown(Cell cell, CellState base, CellState findForClose, boolean canReturn) {
+    public boolean checkDown(Cell cell, CellState base, CellState findForClose, boolean canReturn, boolean shouldChange) {
         if (cell.state != base && cell.state != findForClose) {
             return false;
         }
         if (cell.state == findForClose) {
-            return checkDown(returnAtPos(cell.xPos, cell.yPos + 1), base, findForClose, true);
+            boolean check = checkDown(returnAtPos(cell.xPos, cell.yPos + 1), base, findForClose, true, false);
+            if (shouldChange) {
+                if (check) {
+                    cell.state = base;
+                }
+            }
+            return check;
         }
         else if (cell.state == base && canReturn) {
             return true;
@@ -132,12 +174,18 @@ public final class Field {
         return false;
     }
 
-    public boolean checkLeftUp(Cell cell, CellState base, CellState findForClose, boolean canReturn) {
+    public boolean checkLeftUp(Cell cell, CellState base, CellState findForClose, boolean canReturn, boolean shouldChange) {
         if (cell.state != base && cell.state != findForClose) {
             return false;
         }
         if (cell.state == findForClose) {
-            return checkLeftUp(returnAtPos(cell.xPos - 1, cell.yPos - 1), base, findForClose, true);
+            boolean check = checkLeftUp(returnAtPos(cell.xPos - 1, cell.yPos - 1), base, findForClose, true, false);
+            if (shouldChange) {
+                if (check) {
+                    cell.state = base;
+                }
+            }
+            return check;
         }
         else if (cell.state == base && canReturn) {
             return true;
@@ -145,12 +193,18 @@ public final class Field {
         return false;
     }
 
-    public boolean checkRightUp(Cell cell, CellState base, CellState findForClose, boolean canReturn) {
+    public boolean checkRightUp(Cell cell, CellState base, CellState findForClose, boolean canReturn, boolean shouldChange) {
         if (cell.state != base && cell.state != findForClose) {
             return false;
         }
         if (cell.state == findForClose) {
-            return checkRightUp(returnAtPos(cell.xPos + 1, cell.yPos - 1), base, findForClose, true);
+            boolean check = checkRightUp(returnAtPos(cell.xPos + 1, cell.yPos - 1), base, findForClose, true, false);
+            if (shouldChange) {
+                if (check) {
+                    cell.state = base;
+                }
+            }
+            return check;
         }
         else if (cell.state == base && canReturn) {
             return true;
@@ -158,12 +212,18 @@ public final class Field {
         return false;
     }
 
-    public boolean checkLeftDown(Cell cell, CellState base, CellState findForClose, boolean canReturn) {
+    public boolean checkLeftDown(Cell cell, CellState base, CellState findForClose, boolean canReturn, boolean shouldChange) {
         if (cell.state != base && cell.state != findForClose) {
             return false;
         }
         if (cell.state == findForClose) {
-            return checkLeftDown(returnAtPos(cell.xPos - 1, cell.yPos + 1), base, findForClose, true);
+            boolean check = checkLeftDown(returnAtPos(cell.xPos - 1, cell.yPos + 1), base, findForClose, true, false);
+            if (shouldChange) {
+                if (check) {
+                    cell.state = base;
+                }
+            }
+            return check;
         }
         else if (cell.state == base && canReturn) {
             return true;
@@ -171,12 +231,18 @@ public final class Field {
         return false;
     }
 
-    public boolean checkRightDown(Cell cell, CellState base, CellState findForClose, boolean canReturn) {
+    public boolean checkRightDown(Cell cell, CellState base, CellState findForClose, boolean canReturn, boolean shouldChange) {
         if (cell.state != base && cell.state != findForClose) {
             return false;
         }
         if (cell.state == findForClose) {
-            return checkRightDown(returnAtPos(cell.xPos + 1, cell.yPos + 1), base, findForClose, true);
+            boolean check = checkRightDown(returnAtPos(cell.xPos + 1, cell.yPos + 1), base, findForClose, true, false);
+            if (shouldChange) {
+                if (check) {
+                    cell.state = base;
+                }
+            }
+            return check;
         }
         else if (cell.state == base && canReturn) {
             return true;
@@ -184,13 +250,6 @@ public final class Field {
         return false;
     }
 
-
-//    public void setLeft(Cell cell, CellState base, CellState findToReplace) {
-//        if (cell.state == findToReplace) {
-//            cell.state = base;
-//            setLeft(returnAtPos(cell.xPos - 1, cell.xPos), base, findToReplace);
-//        }
-//    }
 
     @Override
     public String toString() {

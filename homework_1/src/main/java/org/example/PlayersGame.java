@@ -14,11 +14,11 @@ public class PlayersGame extends Game {
 
     private void moveWithPlayer() {
         if (playerTurn == PlayerTurn.first) {
-            playerTurn = PlayerTurn.second;
             playerMove(PlayerTurn.first);
+            playerTurn = PlayerTurn.second;
         } else {
-            playerTurn = PlayerTurn.first;
             playerMove(PlayerTurn.second);
+            playerTurn = PlayerTurn.first;
         }
         updateScores();
     }
@@ -27,18 +27,16 @@ public class PlayersGame extends Game {
         System.out.println(field);
         List<String> ableMoves = findAbleMoves(playerTurn);
         infoOutput.ableMovesOutput(ableMoves);
-        setMove(readMove(ableMoves), playerTurn);
+        Cell cell = field.parsePosition(readMove(ableMoves));
+        CellState thisMove = playerTurn == PlayerTurn.first ? CellState.firstPlayer : CellState.secondPlayer;
+        CellState nextMove = playerTurn == PlayerTurn.first ? CellState.secondPlayer : CellState.firstPlayer;
+        for (var i : field.checkForMoves(cell, thisMove, nextMove).entrySet()) {
+            if (i.getValue()) {
+                field.restoreCell(cell, i.getKey(), thisMove, nextMove);
+            }
+        }
+        cell.state = thisMove;
     }
-
-    private void setMove(String position, PlayerTurn playersMove) {
-        Cell cellToInsert = field.parsePosition(position);
-        CellState base = playerTurn == PlayerTurn.first ? CellState.firstPlayer : CellState.secondPlayer;
-        CellState findFor = playerTurn == PlayerTurn.first ? CellState.secondPlayer : CellState.firstPlayer;
-        Map<Direction, Boolean> shouldSet = field.checkForMoves(cellToInsert, base, findFor);
-
-    }
-
-
 
     List<String> findAbleMoves(PlayerTurn playerTurn) {
         Set<String> positions = new HashSet<>();
@@ -68,7 +66,7 @@ public class PlayersGame extends Game {
                     continue;
                 }
                 if (field.returnAtPos(xPos + i, yPos + j).state == CellState.free) {
-                    if (field.checkForMoves(field.returnAtPos(xPos + i, yPos + j), baseState, findForClose)) {
+                    if (field.isOneMove(field.returnAtPos(xPos + i, yPos + j), baseState, findForClose)) {
                         positions.add(field.returnAtPos(xPos + i, yPos + j).positionInfo());
                     }
                 }
