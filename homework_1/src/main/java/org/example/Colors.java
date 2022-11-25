@@ -1,4 +1,4 @@
-package org.example.display;
+package org.example;
 
 public class Colors {
     public static final String ANSI_RESET = "\u001B[0m";

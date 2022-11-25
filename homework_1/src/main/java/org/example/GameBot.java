@@ -1,10 +1,4 @@
-package org.example.game;
-import org.example.SetGame;
-import org.example.display.Cell;
-import org.example.display.Field;
-import org.example.enums.CellState;
-import org.example.enums.GameMode;
-import org.example.enums.PlayerTurn;
+package org.example;
 
 import java.util.List;
 
@@ -48,25 +42,25 @@ public class GameBot extends Game {
     void botMove() {
         System.out.println(field);
         List<Cell> ableMoves = (List<Cell>)findAbleMoves(PlayerTurn.bot).stream().map(x -> field.parsePosition(x));
-        Cell bestCell = field.findBestMove(ableMoves);
-        for (var i : field.checkForMoves(bestCell, CellState.firstPlayer, CellState.bot).entrySet()) {
-            if (i.getValue()) {
-                field.restoreCell(bestCell, i.getKey(), CellState.firstPlayer, CellState.bot);
-            }
-        }
-        bestCell.state = CellState.firstPlayer;
+//        Cell bestCell = field.findBestMove(ableMoves);
+//        for (var i : field.checkForMoves(bestCell, CellState.firstPlayer, CellState.bot).entrySet()) {
+//            if (i.getValue()) {
+//                field.restoreCell(bestCell, i.getKey(), CellState.firstPlayer, CellState.bot);
+//            }
+//        }
+//        bestCell.state = CellState.firstPlayer;
     }
 
     @Override
     void endOfTheGame() {
         if (isBotWined) {
-            SetGame.bestScore = max(firstPlayerScore, botScore);
+            GameSet.bestScore = max(firstPlayerScore, botScore);
             infoOutput.botCongratulations();
-            SetGame.bestPlayer = "Бот";
+            GameSet.bestPlayer = "Бот";
         } else {
-            SetGame.bestScore = max(firstPlayerScore, secondPlayerScore);
+            GameSet.bestScore = max(firstPlayerScore, secondPlayerScore);
             infoOutput.congratulations();
-            SetGame.bestPlayer = scanner.nextLine();
+            GameSet.bestPlayer = scanner.nextLine();
         }
     }
 }

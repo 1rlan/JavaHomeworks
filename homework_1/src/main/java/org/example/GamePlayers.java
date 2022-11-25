@@ -1,10 +1,4 @@
-package org.example.game;
-import org.example.*;
-import org.example.display.Cell;
-import org.example.display.Field;
-import org.example.enums.CellState;
-import org.example.enums.GameMode;
-import org.example.enums.PlayerTurn;
+package org.example;
 
 import java.util.*;
 import static java.lang.Math.max;
@@ -49,9 +43,9 @@ public class GamePlayers extends Game {
 
     @Override
     void endOfTheGame() {
-        SetGame.bestScore = max(firstPlayerScore, secondPlayerScore);
+        GameSet.bestScore = max(firstPlayerScore, secondPlayerScore);
         infoOutput.congratulations();
-        SetGame.bestPlayer = scanner.nextLine();
+        GameSet.bestPlayer = scanner.nextLine();
     }
 }
 

@@ -1,6 +1,4 @@
-package org.example.display;
-
-import org.example.enums.CellState;
+package org.example;
 
 public final class Cell {
     public CellState state;

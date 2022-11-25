@@ -1,10 +1,5 @@
-package org.example.game;
+package org.example;
 
-import org.example.display.Cell;
-import org.example.enums.CellState;
-import org.example.display.Field;
-import org.example.display.InfoOutput;
-import org.example.enums.PlayerTurn;
 
 import java.util.*;
 

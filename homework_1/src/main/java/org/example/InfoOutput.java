@@ -1,6 +1,4 @@
-package org.example.display;
-
-import org.example.SetGame;
+package org.example;
 
 import java.util.Comparator;
 import java.util.List;
@@ -22,7 +20,7 @@ public class InfoOutput {
             
             Лучший результат - %s
             Введите команду: """,
-            (SetGame.bestScore != 0 ? SetGame.bestScore + " имеет игрок " + SetGame.bestPlayer : "пока не выявлен!"));
+            (GameSet.bestScore != 0 ? GameSet.bestScore + " имеет игрок " + GameSet.bestPlayer : "пока не выявлен!"));
 
     private final String incorrectAttention = """
             Произведен некорректный ввод!
