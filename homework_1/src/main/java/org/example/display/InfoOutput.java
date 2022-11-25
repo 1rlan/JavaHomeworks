@@ -1,4 +1,6 @@
-package org.example;
+package org.example.display;
+
+import org.example.SetGame;
 
 import java.util.Comparator;
 import java.util.List;
@@ -33,6 +35,10 @@ public class InfoOutput {
             Поприветствуем победителя!
             Пожалуйста, введите свое имя для протокола: """;
 
+    private final String botCongratulationsWords = """
+            Поприветствуем победителя!
+            К сожалению, победил ботик. """;
+
 
 
     public void programStart() {
@@ -53,14 +59,26 @@ public class InfoOutput {
 
     public void ableMovesOutput(List<String> moves) {
         System.out.println(String.format("""
-            На данный момент достпны следующие ходы: %s
-            """, moves.stream().sorted(Comparator.naturalOrder())
+            На данный момент достпны следующие ходы: %s """, moves.stream().sorted(Comparator.naturalOrder())
                                .collect(Collectors.toList())
                                .stream().map(String::valueOf)
                                .collect(Collectors.joining(" "))));
+        System.out.println("Введите ход в указаном формате:");
     }
 
     public void congratulations() {
         System.out.println(congratulationsWords);
     }
+    public void botCongratulations() { System.out.println(botCongratulationsWords); }
+
+    public void firstPlayerMoveInfo() {
+        System.out.println("Ходит первый игрок (красный цвет):");
+    }
+    public void secondPlayerMoveInfo() {
+        System.out.println("Ходит второй игрок (зеленый цвет):");
+    }
+    public void botMoveInfo() {
+        System.out.println("Ходит ботик (фиолетовый цвет):");
+    }
+
 }

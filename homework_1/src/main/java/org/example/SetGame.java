@@ -1,5 +1,9 @@
 package org.example;
 
+import org.example.display.InfoOutput;
+import org.example.game.GameBot;
+import org.example.game.GamePlayers;
+
 import java.util.Scanner;
 
 public final class SetGame {
@@ -19,9 +23,9 @@ public final class SetGame {
     private void switchMode(String mode) {
         switch (mode) {
             case "/bot":
-                throw new UnsupportedOperationException();
+                new GameBot();
             case "/player":
-                new PlayersGame();
+                new GamePlayers();
             case "/exit":
                 rules.goodbyeWords();
                 break;

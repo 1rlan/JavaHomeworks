@@ -1,4 +1,6 @@
-package org.example;
+package org.example.display;
+
+import org.example.enums.CellState;
 
 public final class Cell {
     public CellState state;
@@ -9,8 +11,6 @@ public final class Cell {
     public Cell(CellState state) {
         this.state = state;
     }
-
-
 
     public Cell(CellState state, int xPos, int yPos, int position) {
         this.state = state;
@@ -37,11 +37,11 @@ public final class Cell {
             case corner:
                 return " ";
             case bot:
-                return "B";
+                return Colors.ANSI_PURPLE + "■" + Colors.ANSI_RESET;
             case firstPlayer:
-                return  "F";
+                return  Colors.ANSI_RED + "■" + Colors.ANSI_RESET;
             case secondPlayer:
-                return "S";
+                return Colors.ANSI_GREEN + "■" + Colors.ANSI_RESET;
             case numberPosition:
                 return String.valueOf(position);
             case letterPosition:
